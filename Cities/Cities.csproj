@@ -98,6 +98,12 @@
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher_round.png" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="MonkeyCache">
+      <Version>1.0.1-beta</Version>
+    </PackageReference>
+    <PackageReference Include="MonkeyCache.LiteDB">
+      <Version>1.0.1-beta</Version>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.2</Version>
     </PackageReference>

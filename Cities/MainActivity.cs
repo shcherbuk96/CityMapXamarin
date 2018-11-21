@@ -13,6 +13,9 @@ using Newtonsoft.Json;
 using Android.Support.V7.Widget;
 using Cities.Adapter;
 using Plugin.Connectivity;
+using MonkeyCache;
+using MonkeyCache.LiteDB;
+using System.Threading.Tasks;
 
 namespace Cities
 {
@@ -35,6 +38,8 @@ namespace Cities
             SetContentView(Resource.Layout.activity_main);
 
             progress = new ProgressDialog(this);
+
+
             ShowPD();
             InitialRecyclerView();
             LoadData();
@@ -52,10 +57,22 @@ namespace Cities
 
         public async void LoadData()
         {
-            if (!CrossConnectivity.Current.IsConnected)
+
+            Barrel.ApplicationId = Constants.NameDataBase;
+            Barrel.EncryptionKey = Constants.KEY;
+
+            if (!CrossConnectivity.Current.IsConnected && !Barrel.Current.IsExpired(key: Constants.URL))
             {
                 //You are offline, notify the user
-                Toast.MakeText(this, "Check Internet Connection", ToastLength.Short).Show();
+                Toast.MakeText(this, GetString(Resource.String.internet_connection_disable), ToastLength.Short).Show();
+                cities=Barrel.Current.Get<IEnumerable<City>>(key: Constants.URL);
+                adapter.Update(cities);
+                DismissPD();
+            }
+
+            if(Barrel.Current.IsExpired(key: Constants.URL))
+            {
+                Toast.MakeText(this, "You don't have db", ToastLength.Short).Show();
                 DismissPD();
             }
 
@@ -71,16 +88,14 @@ namespace Cities
                 if (responce != null)
                 {
                     Console.WriteLine("true");
-                    var listData = responce.Photos;
-                    cities = listData;
-                    adapter.Update(listData);
-                    DismissPD();
+                    cities = responce.Photos;
+                    Barrel.Current.Add(key: Constants.URL, data: cities, expireIn: TimeSpan.FromDays(1));
+                    adapter.Update(cities);
+                                   
                 }
-                else
-                {
-                    Console.WriteLine("false");
-                }
-                
+
+                DismissPD();
+
             }
             
         }

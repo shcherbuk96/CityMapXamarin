@@ -17,6 +17,10 @@ namespace Cities
         public const string TitleExtra= "TitleExtra";
         public const string DescriptionExtra= "DescriptionExtra";
         public const string UrlExtra = "UrlExtra";
+
+        public const string NameDataBase = "DataBase";
+        public const string KEY = "MyKey";
+
         public const string URL = "https://api.myjson.com/bins/7ybe5";
     }
 }
