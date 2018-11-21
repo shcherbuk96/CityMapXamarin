@@ -3258,6 +3258,9 @@ namespace Cities
 			// aapt resource value: 0x7f090020
 			public const int character_counter_pattern = 2131296288;
 			
+			// aapt resource value: 0x7f09002a
+			public const int internet_connection_disable = 2131296298;
+			
 			// aapt resource value: 0x7f090021
 			public const int password_toggle_content_description = 2131296289;
 			

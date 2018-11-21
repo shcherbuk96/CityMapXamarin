@@ -55,32 +55,6 @@ namespace Cities
             recyclerView.SetAdapter(adapter);
         }
 
-        //private async Task<IEnumerable<City>> GetCitiesAsync()
-        //{
-        //    var url = Constants.URL;
-
-        //    //Dev handle online/offline scenario
-        //    if (!CrossConnectivity.Current.IsConnected)
-        //    {
-        //        return Barrel.Current.Get<IEnumerable<City>>(key: url);
-        //    }
-
-        //    //Dev handles checking if cache is expired
-        //    if (!Barrel.Current.IsExpired(key: url))
-        //    {
-        //        return Barrel.Current.Get<IEnumerable<City>>(key: url);
-        //    }
-
-        //    HttpClient client = new HttpClient();
-        //    client.BaseAddress = new Uri(Constants.URL);
-        //    var jsonResponce = await client.GetStringAsync(client.BaseAddress);
-        //    var responce = JsonConvert.DeserializeObject<ListCities>(jsonResponce);
-
-        //    //Saves the cache and pass it a timespan for expiration
-        //    Barrel.Current.Add(key: url, data: responce, expireIn: TimeSpan.FromDays(1));
-
-        //}
-
         public async void LoadData()
         {
 
@@ -90,7 +64,7 @@ namespace Cities
             if (!CrossConnectivity.Current.IsConnected && !Barrel.Current.IsExpired(key: Constants.URL))
             {
                 //You are offline, notify the user
-                Toast.MakeText(this, "Check Internet Connection", ToastLength.Short).Show();
+                Toast.MakeText(this, GetString(Resource.String.internet_connection_disable), ToastLength.Short).Show();
                 cities=Barrel.Current.Get<IEnumerable<City>>(key: Constants.URL);
                 adapter.Update(cities);
                 DismissPD();
@@ -117,15 +91,11 @@ namespace Cities
                     cities = responce.Photos;
                     Barrel.Current.Add(key: Constants.URL, data: cities, expireIn: TimeSpan.FromDays(1));
                     adapter.Update(cities);
-                    //Saves the cache and pass it a timespan for expiration
+                                   
+                }
 
-                    DismissPD();
-                }
-                else
-                {
-                    Console.WriteLine("false");
-                }
-                
+                DismissPD();
+
             }
             
         }
