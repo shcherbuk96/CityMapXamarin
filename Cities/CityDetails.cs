@@ -19,7 +19,6 @@ namespace Cities
     [Activity(Label = "City", Theme = "@style/AppTheme")]
     public class CityDetails : Activity
     {
-        TextView titileTextView;
         TextView descriptionTextView;
         ImageViewAsync photoImageViewAsync; 
 

@@ -13,6 +13,9 @@ using Newtonsoft.Json;
 using Android.Support.V7.Widget;
 using Cities.Adapter;
 using Plugin.Connectivity;
+using MonkeyCache;
+using MonkeyCache.LiteDB;
+using System.Threading.Tasks;
 
 namespace Cities
 {
@@ -35,6 +38,8 @@ namespace Cities
             SetContentView(Resource.Layout.activity_main);
 
             progress = new ProgressDialog(this);
+
+
             ShowPD();
             InitialRecyclerView();
             LoadData();
@@ -50,12 +55,50 @@ namespace Cities
             recyclerView.SetAdapter(adapter);
         }
 
+        //private async Task<IEnumerable<City>> GetCitiesAsync()
+        //{
+        //    var url = Constants.URL;
+
+        //    //Dev handle online/offline scenario
+        //    if (!CrossConnectivity.Current.IsConnected)
+        //    {
+        //        return Barrel.Current.Get<IEnumerable<City>>(key: url);
+        //    }
+
+        //    //Dev handles checking if cache is expired
+        //    if (!Barrel.Current.IsExpired(key: url))
+        //    {
+        //        return Barrel.Current.Get<IEnumerable<City>>(key: url);
+        //    }
+
+        //    HttpClient client = new HttpClient();
+        //    client.BaseAddress = new Uri(Constants.URL);
+        //    var jsonResponce = await client.GetStringAsync(client.BaseAddress);
+        //    var responce = JsonConvert.DeserializeObject<ListCities>(jsonResponce);
+
+        //    //Saves the cache and pass it a timespan for expiration
+        //    Barrel.Current.Add(key: url, data: responce, expireIn: TimeSpan.FromDays(1));
+
+        //}
+
         public async void LoadData()
         {
-            if (!CrossConnectivity.Current.IsConnected)
+
+            Barrel.ApplicationId = Constants.NameDataBase;
+            Barrel.EncryptionKey = Constants.KEY;
+
+            if (!CrossConnectivity.Current.IsConnected && !Barrel.Current.IsExpired(key: Constants.URL))
             {
                 //You are offline, notify the user
                 Toast.MakeText(this, "Check Internet Connection", ToastLength.Short).Show();
+                cities=Barrel.Current.Get<IEnumerable<City>>(key: Constants.URL);
+                adapter.Update(cities);
+                DismissPD();
+            }
+
+            if(Barrel.Current.IsExpired(key: Constants.URL))
+            {
+                Toast.MakeText(this, "You don't have db", ToastLength.Short).Show();
                 DismissPD();
             }
 
@@ -71,9 +114,11 @@ namespace Cities
                 if (responce != null)
                 {
                     Console.WriteLine("true");
-                    var listData = responce.Photos;
-                    cities = listData;
-                    adapter.Update(listData);
+                    cities = responce.Photos;
+                    Barrel.Current.Add(key: Constants.URL, data: cities, expireIn: TimeSpan.FromDays(1));
+                    adapter.Update(cities);
+                    //Saves the cache and pass it a timespan for expiration
+
                     DismissPD();
                 }
                 else
