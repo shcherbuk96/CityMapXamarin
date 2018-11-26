@@ -20,16 +20,18 @@ namespace Cities
     public class CityDetails : Activity
     {
         TextView descriptionTextView;
-        ImageViewAsync photoImageViewAsync; 
-
+        ImageViewAsync photoImageViewAsync;
+        Button btn;
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
-            SetContentView(Resource.Layout.city_details);
+            SetContentView(Resource.Layout.activity_details);
 
             descriptionTextView = FindViewById<TextView>(Resource.Id.text_view_description);
             photoImageViewAsync = FindViewById<ImageViewAsync>(Resource.Id.image_view_photo);
+            btn = FindViewById<Button>(Resource.Id.btn_map);
+
             
             var title = Intent.GetStringExtra(Constants.TitleExtra);
             var description = Intent.GetStringExtra(Constants.DescriptionExtra);
@@ -41,6 +43,16 @@ namespace Cities
             .LoadingPlaceholder("@drawable/icon_loading", ImageSource.CompiledResource)
             .ErrorPlaceholder("@drawable/icon_error", ImageSource.CompiledResource)
             .Into(photoImageViewAsync);
+
+            btn.Click += Btn_Click;
+        }
+
+        private void Btn_Click(object sender, EventArgs e)
+        {
+            var newIntent = new Intent(this, typeof(Map));
+            newIntent.PutExtra(Constants.LatitudeExtra, Intent.GetDoubleExtra(Constants.LatitudeExtra,20));
+            newIntent.PutExtra(Constants.LongitudeExtra, Intent.GetDoubleExtra(Constants.LongitudeExtra,20));
+            StartActivity(newIntent);
         }
     }
 }

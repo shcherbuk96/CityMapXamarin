@@ -61,7 +61,7 @@ namespace Cities
             Barrel.ApplicationId = Constants.NameDataBase;
             Barrel.EncryptionKey = Constants.KEY;
 
-            if (!CrossConnectivity.Current.IsConnected && !Barrel.Current.IsExpired(key: Constants.URL))
+            if (!CrossConnectivity.Current.IsConnected && !Barrel.Current.IsExpired(key: Constants.URL)) 
             {
                 //You are offline, notify the user
                 Toast.MakeText(this, GetString(Resource.String.internet_connection_disable), ToastLength.Short).Show();
@@ -70,13 +70,13 @@ namespace Cities
                 DismissPD();
             }
 
-            if(Barrel.Current.IsExpired(key: Constants.URL))
+            if (Barrel.Current.IsExpired(key: Constants.URL)) 
             {
                 Toast.MakeText(this, "You don't have db", ToastLength.Short).Show();
                 DismissPD();
             }
 
-            if (CrossConnectivity.Current.IsConnected)
+            if (CrossConnectivity.Current.IsConnected) 
             {
                 Toast.MakeText(this, "You have Internet", ToastLength.Short).Show();
                 //You are online, notify the user
@@ -108,6 +108,8 @@ namespace Cities
             intent.PutExtra(Constants.TitleExtra,city.Title);
             intent.PutExtra(Constants.DescriptionExtra, city.Description);
             intent.PutExtra(Constants.UrlExtra, city.Url);
+            intent.PutExtra(Constants.LatitudeExtra, city.Latitude);
+            intent.PutExtra(Constants.LongitudeExtra, city.Longitude);
             StartActivity(intent);
         }
 
