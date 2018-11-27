@@ -16,113 +16,85 @@ using Plugin.Connectivity;
 using MonkeyCache;
 using MonkeyCache.LiteDB;
 using System.Threading.Tasks;
+using Cities.Data;
 
 namespace Cities
 {
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme")]
     public class MainActivity : AppCompatActivity
     {
-        private const string CityNameAttribute = "CityName";
-        private const string CountryNameAttribute = "CountryName";
+        private ILoadData _iLoadData = new LoadData();
+        private IEnumerable<City> _cities;
+        private ProgressDialog _progress;
+        private CityAdapter _adapter;
+        private RecyclerView _recyclerView;
+        private RecyclerView.LayoutManager _layoutManager;
 
-        IEnumerable<City> cities;
-        ProgressDialog progress;
-        CityAdapter adapter;
-        RecyclerView recyclerView;
-        RecyclerView.LayoutManager layoutManager;
-
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            // Set our view from the "main" layout resource
+
             SetContentView(Resource.Layout.activity_main);
 
-            progress = new ProgressDialog(this);
-
-
+            _progress = new ProgressDialog(this);
+            
             ShowPD();
             InitialRecyclerView();
-            LoadData();
+            _cities = await _iLoadData.GetDataAsync(); //TODO???
+
+            if (_cities != null)
+            {
+                _adapter.Update(_cities);
+            }
+
+            DismissPD();
+            
         }
 
         private void InitialRecyclerView()
         {
-            recyclerView = FindViewById<RecyclerView>(Resource.Id.recycler_view);
-            layoutManager = new GridLayoutManager(ApplicationContext, 3);
-            adapter = new CityAdapter();
-            adapter.ItemClick += OnClick;
-            recyclerView.SetLayoutManager(layoutManager);
-            recyclerView.SetAdapter(adapter);
+            _recyclerView = FindViewById<RecyclerView>(Resource.Id.recycler_view);
+            _layoutManager = new GridLayoutManager(ApplicationContext, 3);
+            _adapter = new CityAdapter();
+            _adapter.ItemClick += AdapterClick;
+            _recyclerView.SetLayoutManager(_layoutManager);
+            _recyclerView.SetAdapter(_adapter);
         }
 
-        public async void LoadData()
+        public void AdapterClick(object sender, int position)
         {
+            var city = _cities.ToArray()[position];
 
-            Barrel.ApplicationId = Constants.NameDataBase;
-            Barrel.EncryptionKey = Constants.KEY;
-
-            if (!CrossConnectivity.Current.IsConnected && !Barrel.Current.IsExpired(key: Constants.URL)) 
-            {
-                //You are offline, notify the user
-                Toast.MakeText(this, GetString(Resource.String.internet_connection_disable), ToastLength.Short).Show();
-                cities=Barrel.Current.Get<IEnumerable<City>>(key: Constants.URL);
-                adapter.Update(cities);
-                DismissPD();
-            }
-
-            if (Barrel.Current.IsExpired(key: Constants.URL)) 
-            {
-                Toast.MakeText(this, "You don't have db", ToastLength.Short).Show();
-                DismissPD();
-            }
-
-            if (CrossConnectivity.Current.IsConnected) 
-            {
-                Toast.MakeText(this, "You have Internet", ToastLength.Short).Show();
-                //You are online, notify the user
-                HttpClient client = new HttpClient();
-                client.BaseAddress = new Uri(Constants.URL);
-                var jsonResponce = await client.GetStringAsync(client.BaseAddress);
-                var responce = JsonConvert.DeserializeObject<ListCities>(jsonResponce);
-
-                if (responce != null)
-                {
-                    Console.WriteLine("true");
-                    cities = responce.Photos;
-                    Barrel.Current.Add(key: Constants.URL, data: cities, expireIn: TimeSpan.FromDays(1));
-                    adapter.Update(cities);
-                                   
-                }
-
-                DismissPD();
-
-            }
-            
-        }
-
-        public void OnClick(object sender, int position)
-        {
-            var city = cities.ToArray()[position];
-            // Display a toast that briefly shows the enumeration of the selected photo:
             var intent = new Intent(this, typeof(CityDetails));
             intent.PutExtra(Constants.TitleExtra,city.Title);
             intent.PutExtra(Constants.DescriptionExtra, city.Description);
             intent.PutExtra(Constants.UrlExtra, city.Url);
             intent.PutExtra(Constants.LatitudeExtra, city.Latitude);
             intent.PutExtra(Constants.LongitudeExtra, city.Longitude);
+
             StartActivity(intent);
         }
 
         public void ShowPD()
         {
-            progress.SetMessage(Resources.GetString(Resource.String.progress_dialog_message));
-            progress.Show();
+            _progress.SetMessage(Resources.GetString(Resource.String.progress_dialog_message));
+            _progress.Show();
         }
 
         public void DismissPD()
         {
-            progress.Dismiss();
+            _progress.Dismiss();
         }
-  
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _adapter.ItemClick -= AdapterClick;
+            }
+
+            base.Dispose(disposing);
+        }
+
     }
 }

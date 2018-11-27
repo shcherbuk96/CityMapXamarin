@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Android.Support.V4.App;
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
+using Android.Support.V4.App;
 
 namespace Cities
 {
     [Activity(Label = "Map")]
     public class Map : Activity, IOnMapReadyCallback
     {
-        private GoogleMap gMap;
-        private double Latitude;
-        private double Longitude;
-        private string Title;
+        private GoogleMap _gMap;
+        private double _latitude;
+        private double _longitude;
+        private string _title;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -28,9 +21,9 @@ namespace Cities
 
             SetContentView(Resource.Layout.activity_map);
 
-            Latitude = Intent.GetDoubleExtra(Constants.LatitudeExtra, 20);
-            Longitude = Intent.GetDoubleExtra(Constants.LongitudeExtra, 20);
-            Title = Intent.GetStringExtra(Constants.TitleExtra);
+            _latitude = Intent.GetDoubleExtra(Constants.LatitudeExtra, 20);
+            _longitude = Intent.GetDoubleExtra(Constants.LongitudeExtra, 20);
+            _title = Intent.GetStringExtra(Constants.TitleExtra);
 
             SetupMap();
         }
@@ -43,15 +36,14 @@ namespace Cities
 
         public void OnMapReady(GoogleMap googleMap)
         {
-            this.gMap = googleMap;
+            this._gMap = googleMap;
 
-            gMap.UiSettings.ZoomControlsEnabled = true;
-            LatLng latlng = new LatLng(Latitude, Longitude);
-            //LatLng latlng = new LatLng(Convert.ToDouble(13.0291), Convert.ToDouble(80.2083));
-            CameraUpdate camera = CameraUpdateFactory.NewLatLngZoom(latlng, 10);
-            gMap.MoveCamera(camera);
-            MarkerOptions options = new MarkerOptions().SetPosition(latlng).SetTitle(Title);
-            gMap.AddMarker(options);
+            _gMap.UiSettings.ZoomControlsEnabled = true;
+            var latlng = new LatLng(_latitude, _longitude);
+            var camera = CameraUpdateFactory.NewLatLngZoom(latlng, 10);
+            _gMap.MoveCamera(camera);
+            var options = new MarkerOptions().SetPosition(latlng).SetTitle(_title);
+            _gMap.AddMarker(options);
         }
     }
 }

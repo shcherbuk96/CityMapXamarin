@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
-
-namespace Cities
+﻿namespace Cities
 {
     class Constants
     {
+        public const string ICON_LOADING = "@drawable/icon_loading";
+        public const string ICON_ERROR = "@drawable/icon_error";
+
         public const string TitleExtra= "TitleExtra";
         public const string DescriptionExtra= "DescriptionExtra";
         public const string UrlExtra = "UrlExtra";

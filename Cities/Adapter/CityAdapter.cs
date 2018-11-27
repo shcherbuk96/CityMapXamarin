@@ -34,8 +34,8 @@ namespace Cities.Adapter
                 cityViewHolder.Label.Text = city.Title;
                 ImageService.Instance
                             .LoadUrl(city.Url)
-                            .LoadingPlaceholder("@drawable/icon_loading", ImageSource.CompiledResource)
-                            .ErrorPlaceholder("@drawable/icon_error", ImageSource.CompiledResource)
+                            .LoadingPlaceholder(Constants.ICON_LOADING, ImageSource.CompiledResource)
+                            .ErrorPlaceholder(Constants.ICON_ERROR, ImageSource.CompiledResource)
                             .Into(cityViewHolder.Image);
 
             }

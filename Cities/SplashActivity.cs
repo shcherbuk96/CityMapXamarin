@@ -21,7 +21,6 @@ namespace Cities
 
             StartActivity(new Intent(this, typeof(MainActivity)));
             Finish();
-            // Create your application here
         }
     }
 }
